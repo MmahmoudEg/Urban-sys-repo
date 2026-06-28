@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>إنشاء حساب جديد</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">تسجيل</button>
+    </form>
+
+    {% if form.errors %}  <!-- ✅ Display form errors if any -->
+        <div class="alert alert-danger mt-3">
+            <strong>خطأ:</strong> يرجى تصحيح الأخطاء التالية:
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    <li>{{ field }}: {{ errors.0 }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <p>لديك حساب بالفعل؟ <a href="{% url 'cases:login' %}">تسجيل الدخول</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>حذف القضايا</h2>
+    <p>هل أنت متأكد من رغبتك في الحذف "{{ object.title }}"?</p>
+    <form method="post" action="{% url 'cases:case_delete' object.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> حذف
+        </button>
+        <a href="{% url 'cases:case_list' %}" class="btn btn-secondary">إلغاء</a>
+    </form>
+{% endblock %}

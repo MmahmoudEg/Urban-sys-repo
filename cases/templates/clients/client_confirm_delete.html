@@ -1,0 +1,15 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>حذف عميل</h2>
+    <p>هل أنت متأكد من رغبتك في الحذف؟ "{{ object.first_name }} {{ object.last_name }}"?</p>
+    <form method="post" action="{% url 'cases:client_delete' object.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> حذف
+        </button>
+        <a href="{% url 'cases:client_list' %}" class="btn btn-secondary">إلغاء</a>
+    </form>
+{% endblock %}

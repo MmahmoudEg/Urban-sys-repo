@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>تسجيل الدخول</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
+    </form>
+    <p>انشاء حساب؟ <a href="{% url 'cases:register' %}">تسجيل الدخول</a></p>
+</div>
+{% endblock %}

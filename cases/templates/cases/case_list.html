@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Search Box -->
+<div class="mb-4">
+    <form method="get" action="{% url 'cases:case_list' %}">
+        <div class="input-group">
+            <input type="text"
+                   class="form-control shadow"
+                   name="q"
+                   placeholder="🔍 Search for a project..."
+                   value="{{ request.GET.q }}">
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<h1 class="mb-4 text-center text-primary">🏠 Projects list</h1>
+<a class="btn btn-success mb-3 shadow" href="{% url 'cases:case_create' %}">➕ Add a new project</a>
+
+<table class="table table-hover shadow">
+    <thead style="background: linear-gradient(90deg, #4caf50, #2196f3); color: white;">
+        <tr>
+            <th>📅 Date</th>
+            <th>🔢 Project ID</th>
+            <th>🔖 Project type</th>
+            <th>🏛 Zone</th>
+            <th>📌 Address</th>
+            <th>📂 Status</th>
+            <th>👤 Customer</th>
+            <th>👨‍⚖️ Project manager</th>
+            <th>⚙️ Comments </th>
+            <th>⏳Next deadline</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for case in object_list %}
+        <tr>
+            <td>{{ case.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                <a href="#" class="case-number text-info" 
+                   data-description="{{ case.description }}" 
+                   data-hearings='[{% for hearing in case.hearings.all %}"{{ hearing.hearing_date|date:'Y-m-d H:i' }}"{% if not forloop.last %}, {% endif %}{% endfor %}]'>
+                    {{ case.case_number }}
+                </a>
+            </td>
+            <td>{{ case.get_case_type_display }}</td>
+            <td>{{ case.get_court_display }}</td>
+            <td>{{ case.title }}</td>
+            <td>{{ case.get_status_display }}</td>
+            <td>{{ case.client.first_name }} {{ case.client.last_name }}</td>
+            <td>{{ case.lawyer.first_name }} {{ case.lawyer.last_name }}</td>
+            <td>
+                <a class="btn btn-sm btn-info shadow-sm" href="{% url 'cases:case_update' case.pk %}">Edit</a>
+                <a class="btn btn-sm btn-danger shadow-sm" href="{% url 'cases:case_delete' case.pk %}">Delete</a>
+                <a href="{% url 'cases:case_documents' pk=case.pk %}" class="btn btn-sm btn-warning shadow-sm">
+                    المستندات
+                </a>
+            </td>
+            <td>
+                {% with next_hearing=case.hearings.first %}
+                    {% if next_hearing %}
+                        {{ next_hearing.hearing_date|date:"Y-m-d H:i" }}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                {% endwith %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="10" class="text-center text-warning">No projects found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Case Description Modal -->
+<div class="modal fade" id="caseDescriptionModal" tabindex="-1" aria-labelledby="caseDescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="caseDescriptionModalLabel">📝 Project details</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-case-description"></p>
+                <h6 class="text-secondary">📅 Visits schedule:</h6>
+                <ul id="modal-hearing-dates" style="padding-left: 20px;"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.case-number').forEach(function (element) {
+            element.addEventListener('click', function (event) {
+                event.preventDefault();
+                const description = this.getAttribute('data-description');
+                const hearings = this.getAttribute('data-hearings') ? JSON.parse(this.getAttribute('data-hearings')) : [];
+                document.getElementById('modal-case-description').textContent = description;
+
+                const hearingsList = document.getElementById('modal-hearing-dates');
+                hearingsList.innerHTML = "";
+                hearings.forEach(date => {
+                    const li = document.createElement('li');
+                    li.textContent = date;
+                    hearingsList.appendChild(li);
+                });
+
+                const modal = new bootstrap.Modal(document.getElementById('caseDescriptionModal'));
+                modal.show();
+            });
+        });
+    });
+</script>
+
+{% endblock %}

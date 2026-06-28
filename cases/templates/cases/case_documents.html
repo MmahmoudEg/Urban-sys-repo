@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Documents for Case: {{ case.title }}</h2>
+<ul>
+  {% for document in documents %}
+    <li>
+      <a href="{{ document.file.url }}" target="_blank">{{ document.file.name }}</a>
+      <small>(Uploaded: {{ document.created_at }})</small>
+    </li>
+  {% empty %}
+    <li>No documents found</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'cases:case_list' %}" class="btn btn-secondary">Back to Cases</a>
+{% endblock %}

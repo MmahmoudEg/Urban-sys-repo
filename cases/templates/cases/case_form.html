@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+{{ form.media }}
+
+<style>
+  .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      margin: 20px auto;
+      max-width: 1000px;
+  }
+  .form-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+  }
+  .form-section-title {
+      color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      font-size: 1.2em;
+  }
+  .dynamic-form {
+      border: 1px solid #dee2e6;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      background: white;
+  }
+  .dynamic-form .btn-remove {
+      margin-top: 10px;
+  }
+  .errorlist {
+      color: #dc3545;
+      padding-left: 0;
+      list-style: none;
+      font-size: 0.9em;
+  }
+</style>
+
+<div class="form-container">
+  <h1 class="text-center mb-4">
+    {% if object %}
+     Edit orihect: {{ object.case_number }}
+    {% else %}
+     Add a new project
+    {% endif %}
+  </h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <!-- Main Form Errors -->
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Case Information -->
+    <div class="form-section">
+      <h4 class="form-section-title">Main info</h4>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Project ID</label>
+            {% render_field form.case_number class+="form-control" %}
+            {{ form.case_number.errors }}
+          </div>
+          
+          <div class="form-group">
+            <label>Zone</label>
+            {% render_field form.court class+="form-control" %}
+            {{ form.court.errors }}
+          </div>
+          
+          <div class="form-group">
+            <label>Project type</label>
+            {% render_field form.case_type class+="form-control" %}
+            {{ form.case_type.errors }}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Status</label>
+            {% render_field form.status class+="form-control" %}
+            {{ form.status.errors }}
+          </div>
+          
+          <div class="form-group">
+            <label>Customer</label>
+            {% render_field form.client class+="form-control" %}
+            {{ form.client.errors }}
+          </div>
+          
+          <div class="form-group">
+            <label>Project manager </label>
+            {% render_field form.lawyer class+="form-control" %}
+            {{ form.lawyer.errors }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case Details -->
+    <div class="form-section">
+      <h4 class="form-section-title">Project details</h4>
+      
+      <div class="form-group">
+        <label>Address</label>
+        {% render_field form.title class+="form-control" %}
+        {{ form.title.errors }}
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        {% render_field form.description class+="form-control" rows="4" %}
+        {{ form.description.errors }}
+      </div>
+    </div>
+
+    <!-- Documents Section -->
+    <div class="form-section">
+      <h4 class="form-section-title">Attached docs</h4>
+      {{ document_formset.management_form }}
+      
+      <div id="documents-container">
+        {% for form in document_formset %}
+        <div class="dynamic-form document-form">
+          {{ form.id }}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Document </label>
+                {% render_field form.title class+="form-control" %}
+                {{ form.title.errors }}
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>File</label>
+                {% if form.instance.file %}
+                <div class="mb-2">
+                  <a href="{{ form.instance.file.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-file-pdf"></i> Current file
+                  </a>
+                  <span class="text-muted small">(Leave empty to keep the current file)</span>
+                </div>
+                {% endif %}
+                {% render_field form.file class+="form-control-file" %}
+                {{ form.file.errors }}
+              </div>
+            </div>
+          </div>
+          
+          {% if form.instance.pk %}
+          <div class="form-check">
+            {% render_field form.DELETE class+="form-check-input" %}
+            <label class="form-check-label text-danger">Delete this file</label>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      
+      <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-document">
+        <i class="fas fa-plus-circle"></i> Add file
+      </button>
+    </div>
+
+    <!-- Hearings Section -->
+    <div class="form-section">
+      <h4 class="form-section-title">Visit schedule</h4>
+      {{ hearing_formset.management_form }}
+      
+      <div id="hearings-container">
+        {% for form in hearing_formset %}
+        <div class="dynamic-form hearing-form">
+          {{ form.id }}
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Visit date and time</label>
+                {% render_field form.hearing_date class+="form-control" %}
+                {{ form.hearing_date.errors }}
+              </div>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="form-group">
+                <label>Visit details</label>
+                {% render_field form.notes class+="form-control" rows="2" %}
+                {{ form.notes.errors }}
+              </div>
+            </div>
+          </div>
+          
+          {% if form.instance.pk %}
+          <div class="form-check">
+            {% render_field form.DELETE class+="form-check-input" %}
+            <label class="form-check-label text-danger">Delete this visit</label>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      
+      <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-hearing">
+        <i class="fas fa-plus-circle"></i> Add visit
+      </button>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions text-center mt-4">
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="fas fa-save"></i> Save Project
+      </button>
+      <a href="{% url 'cases:case_list' %}" class="btn btn-outline-secondary btn-lg">
+        <i class="fas fa-times"></i> Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- Hidden Templates -->
+<div id="empty-document-form" class="d-none">
+  <div class="dynamic-form document-form">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Document</label>
+          <input type="text" name="documents-__prefix__-title" class="form-control">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>File</label>
+          <input type="file" name="documents-__prefix__-file" class="form-control-file">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="empty-hearing-form" class="d-none">
+  <div class="dynamic-form hearing-form">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Visit date and time</label>
+          <input type="datetime-local" name="hearings-__prefix__-hearing_date" class="form-control">
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="form-group">
+          <label>Visit details</label>
+          <textarea name="hearings-__prefix__-notes" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Document Formset
+  let documentFormCount = parseInt('{{ document_formset.total_form_count }}');
+  const documentContainer = document.getElementById('documents-container');
+  const addDocumentButton = document.getElementById('add-document');
+  const documentTotalForms = document.getElementById('id_documents-TOTAL_FORMS');
+  
+  addDocumentButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    const newForm = document.getElementById('empty-document-form').innerHTML
+      .replace(/__prefix__/g, documentFormCount);
+    documentContainer.insertAdjacentHTML('beforeend', newForm);
+    documentFormCount++;
+    documentTotalForms.value = documentFormCount;
+  });
+
+  // Hearing Formset
+  let hearingFormCount = parseInt('{{ hearing_formset.total_form_count }}');
+  const hearingContainer = document.getElementById('hearings-container');
+  const addHearingButton = document.getElementById('add-hearing');
+  const hearingTotalForms = document.getElementById('id_hearings-TOTAL_FORMS');
+  
+  addHearingButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    const newForm = document.getElementById('empty-hearing-form').innerHTML
+      .replace(/__prefix__/g, hearingFormCount);
+    hearingContainer.insertAdjacentHTML('beforeend', newForm);
+    hearingFormCount++;
+    hearingTotalForms.value = hearingFormCount;
+  });
+
+  // Delete buttons
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-remove')) {
+      e.preventDefault();
+      const form = e.target.closest('.dynamic-form');
+      const deleteCheckbox = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
+      if (deleteCheckbox) {
+        deleteCheckbox.checked = true;
+        form.style.display = 'none';
+      } else {
+        form.remove();
+      }
+    }
+  });
+});
+</script>
+
+{% endblock %}
