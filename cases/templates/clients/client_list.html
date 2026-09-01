@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Add this above the cases list --> مربع البحث
+<!-- Add this above the cases list --> Search bar
 <div class="mb-4">
     <form method="get" action="{% url 'cases:client_list' %}">
       <div class="input-group">
         <input type="text"
                class="form-control"
                name="q"
-               placeholder="البحث عن عميل..."
+               placeholder="search for a customer..."
                value="{{ request.GET.q }}">
         <button class="btn btn-outline-secondary" type="submit">
           <i class="fas fa-search"></i>
@@ -16,10 +16,10 @@
       </div>
     </form>
   </div>
-<!-- مربع البحث -->
+<!-- Search bar -->
 
-    <h1 class="mb-4">العملاء</h1>
-    <a class="btn btn-primary mb-3" href="{% url 'cases:client_create' %}">إضافه عميل</a>
+    <h1 class="mb-4">Customers</h1>
+    <a class="btn btn-primary mb-3" href="{% url 'cases:client_create' %}">Add a customer </a>
     <table class="table table-striped table-bordered">
         <thead class="thead-dark">
         <tr>
@@ -36,13 +36,13 @@
                 <td>{{ client.email }}</td>
                 <td>{{ client.phone }}</td>
                 <td>
-                    <a class="btn btn-sm btn-info" href="{% url 'cases:client_update' client.pk %}">تعديل</a>
-                    <a class="btn btn-sm btn-danger" href="{% url 'cases:client_delete' client.pk %}">الغاء</a>
+                    <a class="btn btn-sm btn-info" href="{% url 'cases:client_update' client.pk %}">edit</a>
+                    <a class="btn btn-sm btn-danger" href="{% url 'cases:client_delete' client.pk %}">cancel</a>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="4" class="text-center"> لم يتم العثور علي اي عميل.</td>
+                <td colspan="4" class="text-center"> No customers found.</td>
             </tr>
         {% endfor %}
         </tbody>

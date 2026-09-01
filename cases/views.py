@@ -1,5 +1,5 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
-from .models import Client, Case, Lawyer
+from .models import Client, Case, Lawyer  , Vendor
 from .forms import ClientForm, LawyerForm, CaseForm
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -86,6 +86,7 @@ class HomeView(TemplateView):
         context['clients_count'] = Client.objects.count()
         context['lawyers_count'] = Lawyer.objects.count()
         context['cases_count'] = Case.objects.count()
+        context["vendors_count"] = Vendor.objects.count()
         context['upcoming_hearings'] = Hearing.objects.filter(hearing_date__date=tomorrow)
 
         return context

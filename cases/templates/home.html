@@ -55,6 +55,15 @@
                     </div>
                 </div>
             </div>
+             <div class="col-sm-4 mb-3">
+                <div class="card text-white bg-success shadow-sm">
+                    <div class="card-header">Vendors</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ vendors_count }}</h5>
+                        <p class="card-text">Total</p>
+                    </div>
+                </div>
+            </div> 
             <div class="col-sm-4 mb-3">
                 <div class="card text-white bg-danger shadow-sm">
                     <div class="card-header">Projects</div>
@@ -73,7 +82,7 @@
         <ul>
             {% for hearing in upcoming_hearings %}
             <li>
-                <strong>القضية:</strong> {{ hearing.case.title }} |
+                <strong>Project:</strong> {{ hearing.case.title }} |
                 <strong>التاريخ:</strong> {{ hearing.hearing_date|date:"Y-m-d H:i" }}
             </li>
             {% endfor %}
@@ -91,7 +100,7 @@
             <i class="fas fa-users"></i> View Customers
         </a>
         <a class="animated-btn btn btn-secondary btn-lg m-2" href="{% url 'cases:lawyer_list' %}" role="button">
-            <i class="fas fa-gavel"></i> View vendors
+            <i class="fas fa-gavel"></i> View project managers
         </a>
         <a class="animated-btn btn btn-success btn-lg m-2" href="{% url 'cases:case_list' %}" role="button">
             <i class="fas fa-briefcase"></i> View projects
